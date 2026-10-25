@@ -55,6 +55,8 @@ The full prompt is in [`system_prompt.md`](system_prompt.md).
 ## Sample Output
 
 ![Sample email](screenshots/sample_email.png)
+![Sample email](screenshots/sample_email_2.png)
+![Sample email](screenshots/sample_email_3.png)
 
 The test run used a sample customer list (29 customers across 24 cities) and produced a summary, a metrics table, insights, top and bottom city breakdowns, recommendations and data notes.
 
