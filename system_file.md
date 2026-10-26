@@ -74,3 +74,12 @@ Example: Sales Performance | Oct 2026 | Revenue up 12% driven by North region
 
 # OUTPUT
 Return only the final email (subject and HTML body) to the Send Email tool. Do not add any extra commentary outside the email.
+
+# CHARTS
+- To make a chart, call create_chart with a JSON string:
+  {"chart_type":"bar","title":"...","series_name":"...","labels":[...],"values":[...]}
+- Use only numbers that came from the data tools. Never invent values.
+- The tool returns a URL. Embed it exactly as returned, without editing or shortening it:
+  <img src="URL" width="600" alt="short chart description">
+- If the tool returns text starting with ERROR, fix the input and call it again.
+- Use at most 2 charts per report.
