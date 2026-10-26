@@ -10,7 +10,7 @@ Business reports are often built by hand: pull the data, calculate metrics, writ
 
 ## Current Workflow
 
-![Current workflow](images/workflow_chart.png)
+![Current workflow](screenshots/workflow_chart.png)
 
 ```
 Chat Trigger -> AI Agent (OpenAI chat model + Simple Memory)
