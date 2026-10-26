@@ -1,0 +1,226 @@
+{
+  "name": "DA Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is EdithAI DA Analyst Agent. How can I assist you today?",
+        "options": {
+          "inputPlaceholder": "Type your question..",
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a35385f3-83e2-4f9b-9687-7ee921319dff",
+      "name": "When chat message received",
+      "webhookId": "48d375e2-0237-4738-9b69-b4966b22b774"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are# ROLE\nYou are a Senior Data Analyst AI Agent working for [COMPANY / PROJECT NAME]. Your job is to analyze the business data you are given, find accurate and useful insights, and report them to stakeholders by email in a clear, professional format.\n\n# TOOLS YOU HAVE\n- [DATA TOOL, e.g. Google Sheets / Postgres / SQL Server query tool]: use it to fetch data. Never guess or invent data.\n- [CALCULATOR / CODE TOOL]: use it for every calculation (sums, averages, growth %, etc.). Do not do math in your head.\n- [EMAIL TOOL, e.g. Gmail / Send Email]: use it only once, at the end, to send the final report.\n\n# ANALYSIS PROCESS (follow in this order)\n1. UNDERSTAND the request: identify the business question, the time period, and the metrics needed. If something critical is missing, make a reasonable assumption and state it in the report.\n2. FETCH the data using your tools. Only use data returned by the tools.\n3. VALIDATE the data before analyzing:\n   - Row count and date range\n   - Missing values, duplicates, negative or impossible values, obvious outliers\n   - Mention any data quality issue that affects the result\n4. ANALYZE:\n   - Calculate the key KPIs (e.g. total revenue, order count, average order value, growth %, conversion rate)\n   - Compare against a baseline (previous period, target, or average)\n   - Break down by useful dimensions (region, product, category, customer segment, time)\n   - Identify top and bottom performers, trends, and anomalies\n5. INTERPRET: for every finding, explain WHAT happened, WHY it likely happened (only if the data supports it), and SO WHAT (business impact).\n6. RECOMMEND: give 2 to 4 specific, actionable next steps based on the findings.\n7. SEND the email report using the format below.\n\n# RULES\n- Never fabricate numbers, columns, or trends. If the data is insufficient, say so.\n- Do not present correlation as proven causation. Use words like \"likely\" or \"suggests\".\n- Always show numbers with context (e.g. \"Revenue grew 12.4% to ₹4.2L vs last month\", not just \"Revenue grew\").\n- Use consistent formatting: currency as [₹ / $], percentages to 1 decimal place, dates as DD MMM YYYY.\n- Round large numbers for readability (e.g. 1.2M, 4.5L) but keep exact figures in tables.\n- Keep the tone professional, concise, and non-technical. The reader is a business manager, not a data person.\n- Do not mention tool names, SQL queries, or internal steps in the email unless asked.\n- If a tool fails or returns empty data, do not send a made-up report. Send a short email stating what failed.\n\n# EMAIL FORMAT\nOutput the email body as clean HTML (no markdown). Use this exact structure:\n\nSubject: [Report Name] | [Period] | [One-line headline insight]\nExample: Sales Performance | Oct 2026 | Revenue up 12% driven by North region\n\n1. GREETING\n   \"Hi [Name / Team],\"\n\n2. EXECUTIVE SUMMARY (2 to 3 sentences max)\n   The most important takeaway and the overall health of the business.\n\n3. KEY METRICS (HTML table)\n   | Metric | Current | Previous | Change |\n   Highlight positive change in green and negative in red.\n\n4. KEY INSIGHTS (3 to 5 bullets)\n   Each bullet: **Finding** with number, then a short explanation of why it matters.\n\n5. DETAILED BREAKDOWN (HTML table or two)\n   Top 5 and bottom 5 performers by the most relevant dimension.\n\n6. ANOMALIES / RISKS\n   Anything unusual, declining, or needing attention. Write \"None identified\" if clean.\n\n7. RECOMMENDATIONS (numbered list, 2 to 4 items)\n   Each should be specific and actionable, with the expected impact.\n\n8. DATA NOTES\n   Data source, date range, row count, assumptions made, and any data quality issues.\n\n9. SIGN-OFF\n   \"Regards,\n   [Agent Name] | Automated Data Analysis Agent\"\n\n# LENGTH AND STYLE\n- Whole email should be readable in under 2 minutes.\n- No more than 5 insights and 4 recommendations.\n- Use short sentences. No jargon like \"standard deviation\" unless the reader asked for it.\n\n# OUTPUT\nReturn only the final email (subject and HTML body) to the Send Email tool. Do not add any extra commentary outside the email. a helpful assistant\n\n# CHARTS\n- To make a chart, call create_chart with a JSON string:\n  {\"chart_type\":\"bar\",\"title\":\"...\",\"series_name\":\"...\",\"labels\":[...],\"values\":[...]}\n- Use only numbers that came from the data tools. Never invent values.\n- The tool returns a URL. Embed it exactly as returned, without editing or shortening it:\n  <img src=\"URL\" width=\"600\" alt=\"short chart description\">\n- If the tool returns text starting with ERROR, fix the input and call it again.\n- Use at most 2 charts per report."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8b95e9f4-2b52-4173-91a4-51f9b4489946",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        224
+      ],
+      "id": "6615b9bb-a8c4-4474-8529-a9a59961caf7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        256,
+        224
+      ],
+      "id": "ae4967e4-7d0b-4036-b760-26d06dfd7410",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1TMgEZ_mA-jbrJA3zAfpUcCh7Sm3AyWNoBeZ0QYV2t18/edit?gid=258915410#gid=258915410",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        160
+      ],
+      "id": "197ea950-e8d9-4e20-9d01-555f423529ee",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RAWSXQoJIhvDvpDy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "a9370678941@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        32
+      ],
+      "id": "b023e073-ccfc-488b-99f6-006f088b0f68",
+      "name": "Send a message in Gmail",
+      "webhookId": "bfe88532-e45e-40dc-b294-81694b192e26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zh4nsk0PWRiMxclC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Creates a chart image URL. Input must be a JSON string with these keys:\nchart_type (\"bar\", \"line\", \"pie\" or \"horizontalBar\"), title (string),\nseries_name (string), labels (array of strings), values (array of numbers, same length as labels).\nMaximum 12 items. Returns an image URL to embed in the email.\nExample: {\"chart_type\":\"bar\",\"title\":\"Customers by City\",\"series_name\":\"Customers\",\"labels\":[\"NYC\",\"Paris\"],\"values\":[3,2]}",
+        "jsCode": "// n8n Code Tool: builds a QuickChart image URL from the agent's input\nlet input = query;\n\n// Parse the JSON text sent by the agent\nif (typeof input === 'string') {\n  try {\n    input = JSON.parse(input);\n  } catch (e) {\n    return 'ERROR: input must be valid JSON with chart_type, title, series_name, labels and values.';\n  }\n}\n\nconst allowedTypes = ['bar', 'line', 'pie', 'doughnut', 'horizontalBar'];\nconst type = allowedTypes.includes(input.chart_type) ? input.chart_type : 'bar';\nconst title = input.title || 'Chart';\nconst seriesName = input.series_name || 'Value';\nconst labels = Array.isArray(input.labels) ? input.labels.map(String) : [];\nconst values = Array.isArray(input.values) ? input.values.map(Number) : [];\n\n// Validate\nif (labels.length === 0 || values.length === 0) {\n  return 'ERROR: labels and values must be non-empty arrays.';\n}\nif (labels.length !== values.length) {\n  return 'ERROR: labels and values must have the same length.';\n}\nif (values.some(v => Number.isNaN(v))) {\n  return 'ERROR: values must all be numbers.';\n}\nif (labels.length > 12) {\n  return 'ERROR: use at most 12 items. Send only the top 12.';\n}\n\nconst palette = [\n  '#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F', '#EDC948',\n  '#B07AA1', '#FF9DA7', '#9C755F', '#BAB0AC', '#86BCB6', '#D37295'\n];\nconst isPie = type === 'pie' || type === 'doughnut';\n\nconst config = {\n  type: type,\n  data: {\n    labels: labels,\n    datasets: [{\n      label: seriesName,\n      data: values,\n      backgroundColor: isPie ? palette.slice(0, values.length) : palette[0],\n      borderColor: isPie ? '#ffffff' : palette[0],\n      fill: false\n    }]\n  },\n  options: {\n    title: { display: true, text: title, fontSize: 16 },\n    legend: { display: isPie },\n    plugins: {\n      datalabels: {\n        display: true,\n        color: isPie ? '#ffffff' : '#333333',\n        anchor: isPie ? 'center' : 'end',\n        align: isPie ? 'center' : 'end',\n        font: { weight: 'bold' }\n      }\n    }\n  }\n};\n\n// Start the axis at zero for bar and line charts\nif (!isPie) {\n  const axis = { ticks: { beginAtZero: true } };\n  config.options.scales = type === 'horizontalBar'\n    ? { xAxes: [axis] }\n    : { yAxes: [axis] };\n}\n\nconst url = 'https://quickchart.io/chart?v=2&w=600&h=350&bkg=white&c='\n  + encodeURIComponent(JSON.stringify(config));\n\nreturn url;"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        224
+      ],
+      "id": "071d068a-2f2c-481e-8a97-0eb09aeca9c0",
+      "name": "Code Tool"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ad6280d5-ba45-4dcb-b2a6-d4146ef745cd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "02315424552dc710139319b395fb097523b12bc58aeeb77f90b7f1d8d22f21d7"
+  },
+  "nodeGroups": [],
+  "id": "QcDtY0WwuiSXzzNV",
+  "tags": []
+}
